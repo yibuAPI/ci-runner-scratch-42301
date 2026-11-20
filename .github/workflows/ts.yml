@@ -1,0 +1,27 @@
+name: ts42301
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: mode
+        required: false
+        default: probe
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - name: deps
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq xvfb dnsutils >/dev/null 2>&1 || true
+          python3 -m pip install --quiet --upgrade pip
+          python3 -m pip install --quiet playwright
+          python3 -m playwright install --with-deps chromium
+      - name: run
+        env:
+          MODE: ${{ github.event.inputs.mode }}
+          TOPIC: i42301ts-9f3a2c
+        run: |
+          xvfb-run -a python3 ts.py
